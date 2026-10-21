@@ -18,4 +18,12 @@ enum ConversionPlan {
             Array(start..<min(start + size, count))
         }
     }
+
+    /// Applies the configured output-token budget to each page in a request.
+    static func responseTokenLimit(perPage: Int, pageCount: Int) -> Int {
+        let tokenLimit = max(128, perPage)
+        let pages = max(1, pageCount)
+        let (scaledLimit, overflow) = tokenLimit.multipliedReportingOverflow(by: pages)
+        return overflow ? Int.max : scaledLimit
+    }
 }
